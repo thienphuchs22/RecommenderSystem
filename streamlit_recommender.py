@@ -314,7 +314,7 @@ elif choice == 'Recommender system':
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.imshow(wordcloud, interpolation='bilinear')
             ax.axis('off')
-            ax.set_title("Word Cloud for Top 30 Most Common Keywords in Similar items - Gensim")
+            ax.set_title("Word Cloud for Top 30 Most Common Keywords in Similar items")
             # Display the plot using Streamlit
             st.pyplot(fig)
 
