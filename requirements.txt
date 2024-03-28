@@ -7,7 +7,6 @@ scikit-learn
 underthesea
 sklearn
 sklearn.feature_extraction.text
-pickle
 seaborn
 wordcloud
 re
