@@ -14,7 +14,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # 1. Read data
-data = pd.read_csv("spam.csv", encoding='latin-1')
 ThoiTrangNam_data = pd.read_csv(r'Data_contentbased.csv')
 Rating_data = pd.read_csv(r'Products_ThoiTrangNam_rating_raw.csv',delimiter='\t')
 
