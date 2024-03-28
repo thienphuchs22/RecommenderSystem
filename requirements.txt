@@ -5,9 +5,7 @@ matplotlib
 seaborn
 scikit-learn
 underthesea
-sklearn
 sklearn.feature_extraction.text
-seaborn
 wordcloud
 re
 sklearn.metrics.pairwise
