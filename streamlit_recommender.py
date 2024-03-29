@@ -29,13 +29,16 @@ if choice == 'Business Objective':
     st.subheader("Business Objective")
     st.write("""
     **Mục tiêu/ vấn đề** : 
-             *Xây dựng Recommendation System cho một hoặc một số nhóm hàng hóa trên shopee.vn giúp đề xuất và gợi ý cho người dùng/ khách hàng.
+    """)
+    st.write("""* Xây dựng Recommendation System cho một hoặc một số nhóm hàng hóa trên shopee.vn giúp đề xuất và gợi ý cho người dùng/ khách hàng.
     
     **Dữ liệu được cung cấp** sẵn gồm có các tập tin:
         ***Products_ThoiTrangNam_raw.csv***,
         ***Products_ThoiTrangNam_rating_raw.csv*** chứa thông tin sản phẩm, review và rating cho các sản phẩm thuộc các nhóm hàng Thời trang nam như Áo khoác, Quần jeans, Áo vest,…
     """)  
-    st.write("""###### => Problem/ Requirement: Use Machine Learning algorithms in Python for system recommender""")
+    st.write("""###### => Problem/ Requirement: 
+             
+             * Use Machine Learning algorithms in Python for system recommender""")
     st.image("file_info.png")
 
 
