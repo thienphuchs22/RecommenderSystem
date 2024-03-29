@@ -70,6 +70,13 @@ if choice == 'Business Objective':
     - cosine similarity
     - surprise 
     """)
+    st.subheader("Author:")
+    st.write(""" 
+    - gensim
+    - cosine similarity
+    - surprise 
+    """)
+
 elif choice == 'EDA - Exploratory Data Analysis':
     st.subheader("Exploratory Data Analysis")
     
