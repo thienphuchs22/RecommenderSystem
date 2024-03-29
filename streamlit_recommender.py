@@ -82,8 +82,11 @@ elif choice == 'EDA - Exploratory Data Analysis':
     
     st.write('<font color="red">**Products_ThoiTrangNam_raw.csv**</font>', unsafe_allow_html=True)
     st.dataframe(ThoiTrangNam_data.head(5))
-    st.write('Thông tin file:')
-    st.dataframe(ThoiTrangNam_data.describe())
+    # st.write('Thông tin file:')
+    # st.dataframe(ThoiTrangNam_data.describe())
+
+    st.write("\nTổng số sản phẩm:", ThoiTrangNam_data.shape[0])
+
 
     st.markdown("#### Average Price by Subcategory")
     # Group by 'sub_category' and calculate the average price
@@ -93,6 +96,8 @@ elif choice == 'EDA - Exploratory Data Analysis':
     # Adding labels and title using markdown text
     st.markdown(f"              **X-axis:** Subcategory")
     st.markdown(f"              **Y-axis:** Average Price")
+
+    st.write("\n Sản phẩm có giá cao nhất nằm ở subcategory: Trang phục truyền thống và áo Vest và Blazer.")
     
     # Adding a title above the bar chart using markdown text
     st.markdown("### Average Rating by Subcategory")
@@ -109,6 +114,8 @@ elif choice == 'EDA - Exploratory Data Analysis':
     # Adding labels to the axes
     st.markdown("**X-axis:** Rating")
     st.markdown("**Y-axis:** Average Price")
+
+    st.write("\n Sản phẩm có giá cao thường có rating thấp, rating cao thường có giá trung bình.")
 
     # Adding a title above the bar chart using markdown text
     st.markdown("### Price vs Rating ")
@@ -150,7 +157,7 @@ elif choice == 'EDA - Exploratory Data Analysis':
     st.write("* **25% sản phẩm có rating = 0 : sản phẩm không được rate**")
 
     st.write('<font color="red">**Products_ThoiTrangNam_rating_raw.csv**</font>', unsafe_allow_html=True)
-    st.dataframe(Rating_data.head(3))
+    st.dataframe(Rating_data.head(5))
 
     # Set seaborn style
     sns.set_style("whitegrid")
