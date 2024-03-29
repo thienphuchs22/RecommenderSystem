@@ -188,6 +188,7 @@ elif choice == 'Recommender system':
     tfidf=pickle.load(open('tfidf.pkl','rb'))
     dictionary= pickle.load(open('dictionary.pkl','rb'))
     index= pickle.load(open('index.pkl','rb'))
+    BaselineOnly_algorithm= pickle.load(open('BaselineOnly_algorithm.pkl','rb'))
     #algorithm  = pickle.load(open('Model Recommender system_Userbased.sav', 'rb'))
     
     # Load Vietnamese stopwords
@@ -432,7 +433,7 @@ elif choice == 'Recommender system':
         ######  4. Gợi ý sản phẩm theo User ID  #########
         #################################################
         # Sort the filtered list using the custom sorting key function
-        Surprise_Rating_data = pd.read_csv(r'Surprise_Rating_data.csv')
+        # Surprise_Rating_data = pd.read_csv(r'Surprise_Rating_data.csv')
         #st.dataframe(Rating_data.head())
         # Tạo điều khiển để người dùng chọn sản phẩm
         unique_user_id = Rating_data['user_id'].unique().copy()
@@ -453,7 +454,10 @@ elif choice == 'Recommender system':
             # Display the top 10 most similar products
             userid =int(inputted_user)
             st.write("Top 10 sản phẩm user ",inputted_user," đã mua:")
-            df_select = Surprise_Rating_data[(Surprise_Rating_data['user_id'] == userid)]
-            df_select = df_select.sort_values(by='EstimateScore', ascending=False)
+            df_score = Rating_data[['product_id']]
+            df_score['EstimateScore'] = df_score['product_id'].apply(lambda x: BaselineOnly_algorithm.predict(userid, x).est)
+            df_score = df_score.sort_values(by=['EstimateScore'], ascending=False)
+            df_score = df_score.drop_duplicates()
+            merged_data = pd.merge(df_score, ThoiTrangNam_data, on='product_id')
             # Display the merged data in a st.dataframe
-            st.dataframe(df_select['product_id', 'EstimateScore', 'product_name','link','image','price','rating'].head(10))
+            st.dataframe(merged_data.head(10))
