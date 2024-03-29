@@ -72,9 +72,9 @@ if choice == 'Business Objective':
     """)
     st.subheader("Author:")
     st.write(""" 
-    - gensim
-    - cosine similarity
-    - surprise 
+    - Hạ Thị Thiều Dao
+    - Huỳnh Thiện Phúc
+    - Văn Thị Tường Vi
     """)
 
 elif choice == 'EDA - Exploratory Data Analysis':
