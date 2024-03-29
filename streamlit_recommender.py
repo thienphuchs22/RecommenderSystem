@@ -432,7 +432,7 @@ elif choice == 'Recommender system':
         ######  4. Gợi ý sản phẩm theo User ID  #########
         #################################################
         # Sort the filtered list using the custom sorting key function
-        
+        Surprise_Rating_data = pd.read_csv(r'Surprise_Rating_data.csv')
         #st.dataframe(Rating_data.head())
         # Tạo điều khiển để người dùng chọn sản phẩm
         unique_user_id = Rating_data['user_id'].unique().copy()
@@ -453,11 +453,7 @@ elif choice == 'Recommender system':
             # Display the top 10 most similar products
             userid =int(inputted_user)
             st.write("Top 10 sản phẩm user ",inputted_user," đã mua:")
-            df_select = Rating_data[(Rating_data['user_id'] == userid) & (Rating_data['rating'] >=3)]
-            df_select = df_select.sort_values(by='rating', ascending=False)
-
-            # Merge Rating_data with ThoitrangNam_data based on product_id
-            merged_data = pd.merge(df_select, ThoiTrangNam_data, on='product_id', how='inner')
-
+            df_select = Surprise_Rating_data[(Surprise_Rating_data['user_id'] == userid)]
+            df_select = df_select.sort_values(by='EstimateScore', ascending=False)
             # Display the merged data in a st.dataframe
-            st.dataframe(merged_data.head(10))
+            st.dataframe(df_select['product_id', 'EstimateScore', 'product_name','link','image','price','rating'].head(10))
