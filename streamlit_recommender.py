@@ -20,7 +20,7 @@ Rating_data = pd.read_csv(r'Products_ThoiTrangNam_rating_raw.csv',delimiter='\t'
 #--------------
 # GUI
 st.title("Data Science Project")
-st.write("## Shopee Recommender System")
+st.write("## Project 2 - Shopee Recommender System")
 
 # GUI
 menu = ["Business Objective", "EDA - Exploratory Data Analysis", "Recommender system"]
@@ -28,7 +28,8 @@ choice = st.sidebar.selectbox('Menu', menu)
 if choice == 'Business Objective':    
     st.subheader("Business Objective")
     st.write("""
-    **Mục tiêu/ vấn đề** : Xây dựng Recommendation System cho một hoặc một số nhóm hàng hóa trên shopee.vn giúp đề xuất và gợi ý cho người dùng/ khách hàng.
+    **Mục tiêu/ vấn đề** : 
+             *Xây dựng Recommendation System cho một hoặc một số nhóm hàng hóa trên shopee.vn giúp đề xuất và gợi ý cho người dùng/ khách hàng.
     
     **Dữ liệu được cung cấp** sẵn gồm có các tập tin:
         ***Products_ThoiTrangNam_raw.csv***,
