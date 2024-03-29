@@ -81,8 +81,9 @@ elif choice == 'EDA - Exploratory Data Analysis':
     st.subheader("Exploratory Data Analysis")
     
     st.write('<font color="red">**Products_ThoiTrangNam_raw.csv**</font>', unsafe_allow_html=True)
-    st.dataframe(ThoiTrangNam_data.head(3))
-
+    st.dataframe(ThoiTrangNam_data.head(5))
+    st.write('Thông tin file:')
+    st.dataframe(ThoiTrangNam_data.describe())
 
     st.markdown("#### Average Price by Subcategory")
     # Group by 'sub_category' and calculate the average price
