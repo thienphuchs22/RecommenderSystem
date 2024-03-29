@@ -38,7 +38,7 @@ if choice == 'Business Objective':
         ***Products_ThoiTrangNam_rating_raw.csv*** chứa thông tin sản phẩm, review và rating cho các sản phẩm thuộc các nhóm hàng Thời trang nam như Áo khoác, Quần jeans, Áo vest,…
     """)  
     st.write("""###### => Problem/ Requirement:""")
-    st.write("""* Use Machine Learning algorithms in Python for system recommender""")
+    st.write("""* Use Machine Learning algorithms in Python for system recommender: content- based filtering, collaborative filtering - user based""")
     st.image("file_info.png")
 
 
@@ -58,8 +58,18 @@ if choice == 'Business Objective':
     """)  
     st.image("contentbased.png")
 
-    st.subheader("Collaborative Filtering")
+    st.subheader("User-Based Collaborative Filtering")
+    st.write(""" User-Based Collaborative Filtering: là một kỹ thuật được sử dụng để dự đoán các mặt hàng mà người dùng có thể thích trên cơ sở xếp hạng được đưa ra cho mặt hàng đó bởi những người dùng khác có cùng sở thích với người dùng mục tiêu.
+    """)
+    st.write(""" Ý tưởng cơ bản của thuật toán này là dự đoán mức độ yêu thích của một user đối với một item dựa trên các users khác “gần giống” với user đang xét. Việc xác định độ “giống nhau” giữa các users có thể dựa vào mức độ quan tâm (rating) của các users này với các items khác mà hệ thống đã biết trong quá khứ.
+    """)
     st.image("userbased.png")
+    st.subheader("Công nghệ sử dụng")
+    st.write(""" 
+    - gensim
+    - cosine similarity
+    - surprise 
+    """)
 elif choice == 'EDA - Exploratory Data Analysis':
     st.subheader("Exploratory Data Analysis")
     
