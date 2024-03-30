@@ -77,31 +77,26 @@ if choice == 'Business Objective':
     st.write("""
     **Ưu điểm:**
 
-    - Tính đa dạng và cá nhân hóa: CF có thể cung cấp các đề xuất cá nhân dựa trên sở thích của người dùng và hành vi của họ mà không cần thông tin chi tiết về sản phẩm hoặc người dùng.
+    - Tính đa dạng và cá nhân hóa.
 
-    - Không cần thông tin sản phẩm: CF không yêu cầu thông tin chi tiết về sản phẩm, chỉ cần thông tin về các đánh giá hoặc hành vi của người dùng.
+    - Không cần thông tin sản phẩm.
 
-    - Tính linh hoạt: CF có thể áp dụng cho nhiều loại dữ liệu, bao gồm đánh giá độc lập, mua hàng hoặc xem video.
+    - Tính linh hoạt.
 
     **Nhược điểm:**
 
     - Cold start problem: CF gặp khó khăn khi đối mặt với người dùng mới hoặc sản phẩm mới, gọi là "cold start problem", vì không có đủ thông tin để tạo ra các đề xuất chính xác.
 
-    - Số lượng dữ liệu lớn: Trong các hệ thống lớn, việc tính toán và lưu trữ ma trận similarity có thể trở nên không khả thi do số lượng lớn người dùng và sản phẩm.
+    - Số lượng dữ liệu lớn. 
 
-    - Sparse data: Dữ liệu thường rất thưa, với nhiều người dùng chỉ đánh giá hoặc tương tác với một số ít sản phẩm. Điều này làm cho việc dự đoán và đề xuất trở nên khó khăn.
+    - Sparse data: Dữ liệu thường rất thưa.
 
     - Over-specialization: Mô hình có thể trở nên quá chuyên biệt và chỉ đề xuất các sản phẩm tương tự với nhau, không khuyến khích khám phá sản phẩm mới.
 
     - Sensitivity to noise and outliers: CF có thể nhạy cảm với nhiễu và dữ liệu ngoại lai, có thể dẫn đến các đề xuất không chính xác.
     """)
     st.image("userbased.png")
-    st.subheader("Công nghệ sử dụng")
-    st.write(""" 
-    - gensim
-    - cosine similarity
-    - surprise 
-    """)
+
     st.subheader("Nhóm Thực hiện:")
     st.write("\U0001F467 - Hạ Thị Thiều Dao")
     st.write("\U0001F466 - Huỳnh Thiện Phúc")
