@@ -12,36 +12,47 @@ from underthesea import word_tokenize, pos_tag, sent_tokenize
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import surprise
+import math
+import difflib
+
 
 # 1. Read data
 ThoiTrangNam_data = pd.read_csv(r'Data_contentbased.csv')
+ThoiTrangNam_Raw = pd.read_csv(r'Products_ThoiTrangNam_raw.csv')
 Rating_data = pd.read_csv(r'Products_ThoiTrangNam_rating_raw.csv',delimiter='\t')
 
 #--------------
 # GUI
 st.title("Data Science Project")
 st.write("## Project 2 - Shopee Recommender System")
+html = '<img src="https://cdn-oss.ginee.com/official/wp-content/uploads/2022/03/image-446-107.png" alt="icon" style="vertical-align: middle; margin-right: 10px; max-width: 100%;">'
+st.markdown(f"## {html}", unsafe_allow_html=True)
 
 # GUI
 menu = ["Business Objective", "EDA - Exploratory Data Analysis", "Recommender system"]
+
+
 choice = st.sidebar.selectbox('Menu', menu)
 if choice == 'Business Objective':    
     st.subheader("Business Objective")
-    st.write("""
-    **Mục tiêu/ vấn đề** : 
-    """)
+    st.write("\U0001F3AF **Mục Tiêu/ Vấn đề**")
     st.write("""* Xây dựng Recommendation System cho một hoặc một số nhóm hàng hóa trên shopee.vn giúp đề xuất và gợi ý cho người dùng/ khách hàng.
-    """)
+    """)    
+    html = '<img src="https://cdn.vietnambiz.vn/171464876016439296/2020/5/15/rec-15895160961942104685943.jpeg" alt="icon" style="vertical-align: middle; margin-right: 10px; max-width: 100%;">'
+    st.markdown(f"## {html}", unsafe_allow_html=True)
     st.write("""
     **Dữ liệu được cung cấp** sẵn gồm có các tập tin:
         ***Products_ThoiTrangNam_raw.csv***,
         ***Products_ThoiTrangNam_rating_raw.csv*** chứa thông tin sản phẩm, review và rating cho các sản phẩm thuộc các nhóm hàng Thời trang nam như Áo khoác, Quần jeans, Áo vest,…
     """)  
-    st.write("""###### => Problem/ Requirement:""")
-    st.write("""* Use Machine Learning algorithms in Python for system recommender: content- based filtering, collaborative filtering - user based""")
+    st.write("\U00002753 **Problem/Requirement:**")
+    st.write("""* Sử dụng thuật toán Machine Learning trong Python cho Recommender system: **content-based filtering**, **collaborative filtering - user based**""")
     st.image("file_info.png")
 
-
+    
+    html = '<img src="https://www.mdpi.com/electronics/electronics-11-02630/article_deploy/html/images/electronics-11-02630-g001-550.jpg" alt="icon" style="vertical-align: middle; margin-right: 10px; max-width: 100%;">'
+    st.markdown(f"## {html}", unsafe_allow_html=True)
     st.subheader("Content-based filtering")
     st.write("""
     Trong Content-based filtering, chúng ta đề xuất các sản phẩm tương tự với các sản phẩm mà người dùng thích (tìm kiếm) dựa trên các thuộc tính của mục đó cho người dùng.
@@ -63,6 +74,27 @@ if choice == 'Business Objective':
     """)
     st.write(""" Ý tưởng cơ bản của thuật toán này là dự đoán mức độ yêu thích của một user đối với một item dựa trên các users khác “gần giống” với user đang xét. Việc xác định độ “giống nhau” giữa các users có thể dựa vào mức độ quan tâm (rating) của các users này với các items khác mà hệ thống đã biết trong quá khứ.
     """)
+    st.write("""
+    **Ưu điểm:**
+
+    - Tính đa dạng và cá nhân hóa: CF có thể cung cấp các đề xuất cá nhân dựa trên sở thích của người dùng và hành vi của họ mà không cần thông tin chi tiết về sản phẩm hoặc người dùng.
+
+    - Không cần thông tin sản phẩm: CF không yêu cầu thông tin chi tiết về sản phẩm, chỉ cần thông tin về các đánh giá hoặc hành vi của người dùng.
+
+    - Tính linh hoạt: CF có thể áp dụng cho nhiều loại dữ liệu, bao gồm đánh giá độc lập, mua hàng hoặc xem video.
+
+    **Nhược điểm:**
+
+    - Cold start problem: CF gặp khó khăn khi đối mặt với người dùng mới hoặc sản phẩm mới, gọi là "cold start problem", vì không có đủ thông tin để tạo ra các đề xuất chính xác.
+
+    - Số lượng dữ liệu lớn: Trong các hệ thống lớn, việc tính toán và lưu trữ ma trận similarity có thể trở nên không khả thi do số lượng lớn người dùng và sản phẩm.
+
+    - Sparse data: Dữ liệu thường rất thưa, với nhiều người dùng chỉ đánh giá hoặc tương tác với một số ít sản phẩm. Điều này làm cho việc dự đoán và đề xuất trở nên khó khăn.
+
+    - Over-specialization: Mô hình có thể trở nên quá chuyên biệt và chỉ đề xuất các sản phẩm tương tự với nhau, không khuyến khích khám phá sản phẩm mới.
+
+    - Sensitivity to noise and outliers: CF có thể nhạy cảm với nhiễu và dữ liệu ngoại lai, có thể dẫn đến các đề xuất không chính xác.
+    """)
     st.image("userbased.png")
     st.subheader("Công nghệ sử dụng")
     st.write(""" 
@@ -70,17 +102,15 @@ if choice == 'Business Objective':
     - cosine similarity
     - surprise 
     """)
-    st.subheader("Author:")
-    st.write(""" 
-    - Hạ Thị Thiều Dao
-    - Huỳnh Thiện Phúc
-    - Văn Thị Tường Vi
-    """)
+    st.subheader("Nhóm Thực hiện:")
+    st.write("\U0001F467 - Hạ Thị Thiều Dao")
+    st.write("\U0001F466 - Huỳnh Thiện Phúc")
+    st.write("\U0001F467 - Văn Thị Tường Vi")
 
 elif choice == 'EDA - Exploratory Data Analysis':
     st.subheader("Exploratory Data Analysis")
     
-    st.write('<font color="red">**Products_ThoiTrangNam_raw.csv**</font>', unsafe_allow_html=True)
+    st.write('<font color="red">\U0001F4C1 **Products_ThoiTrangNam_raw.csv**</font>', unsafe_allow_html=True)
     st.dataframe(ThoiTrangNam_data.head(5))
     # st.write('Thông tin file:')
     # st.dataframe(ThoiTrangNam_data.describe())
@@ -97,7 +127,7 @@ elif choice == 'EDA - Exploratory Data Analysis':
     st.markdown(f"              **X-axis:** Subcategory")
     st.markdown(f"              **Y-axis:** Average Price")
 
-    st.write("\n Sản phẩm có giá cao nhất nằm ở subcategory: Trang phục truyền thống và áo Vest và Blazer.")
+    st.write("\n \U0001F5EB Sản phẩm có giá cao nhất nằm ở subcategory: Trang phục truyền thống và áo Vest và Blazer.")
     
     # Adding a title above the bar chart using markdown text
     st.markdown("### Average Rating by Subcategory")
@@ -115,7 +145,7 @@ elif choice == 'EDA - Exploratory Data Analysis':
     st.markdown("**X-axis:** Rating")
     st.markdown("**Y-axis:** Average Price")
 
-    st.write("\n Sản phẩm có giá cao thường có rating thấp, rating cao thường có giá trung bình.")
+    st.write("\n \U0001F5EB Sản phẩm có giá cao thường có rating thấp, rating cao thường có giá trung bình.")
 
     # Adding a title above the bar chart using markdown text
     st.markdown("### Price vs Rating ")
@@ -151,12 +181,12 @@ elif choice == 'EDA - Exploratory Data Analysis':
     st.dataframe(ThoiTrangNam_data.describe()) 
 
     # Write the analysis in Streamlit format
-    st.write("* Giá trung bình của các sản phẩm là khoảng 231,696.5, với độ lệch chuẩn cao, cho thấy sự biến động lớn về giá cả.")
-    st.write("* Có các sản phẩm có giá từ 0 đến 100,000,000, với hầu hết nằm dưới 270,000.")
-    st.write("* Đánh giá chủ yếu tập trung giữa 0 và 5, với một số lượng đáng kể các sản phẩm có đánh giá là 0, có thể cho thấy các sản phẩm chưa được đánh giá hoặc đánh giá thấp.")
-    st.write("* **25% sản phẩm có rating = 0 : sản phẩm không được rate**")
+    st.write("\U0001F5EB * Giá trung bình của các sản phẩm là khoảng 231,696.5, với độ lệch chuẩn cao, cho thấy sự biến động lớn về giá cả.")
+    st.write("\U0001F5EB * Có các sản phẩm có giá từ 0 đến 100,000,000, với hầu hết nằm dưới 270,000.")
+    st.write("\U0001F5EB * Đánh giá chủ yếu tập trung giữa 0 và 5, với một số lượng đáng kể các sản phẩm có đánh giá là 0, có thể cho thấy các sản phẩm chưa được đánh giá hoặc đánh giá thấp.")
+    st.write("\U0001F5EB * **25% sản phẩm có rating = 0 : sản phẩm không được rate**")
 
-    st.write('<font color="red">**Products_ThoiTrangNam_rating_raw.csv**</font>', unsafe_allow_html=True)
+    st.write('<font color="red">\U0001F4C1 **Products_ThoiTrangNam_rating_raw.csv**</font>', unsafe_allow_html=True)
     st.dataframe(Rating_data.head(5))
 
     # Set seaborn style
@@ -176,13 +206,13 @@ elif choice == 'EDA - Exploratory Data Analysis':
     # Print total data information
     st.write("Total data")
     st.write("-" * 50)
-    st.write("\nTotal number of ratings:", Rating_data.shape[0])
-    st.write("Total number of users:", len(np.unique(Rating_data.user_id)))
-    st.write("Total number of products:", len(np.unique(Rating_data.product_id)))
+    st.write("\n \U0001F5EB Total number of ratings:", Rating_data.shape[0])
+    st.write("\U0001F5EB Total number of users:", len(np.unique(Rating_data.user_id)))
+    st.write("\U0001F5EB Total number of products:", len(np.unique(Rating_data.product_id)))
 
     # Calculate and display the percentage of products with less than 54 ratings
     percent_less_than_54 = (Rating_data[Rating_data['rating'] < 54].shape[0] / Rating_data.shape[0]) * 100
-    st.write("có 75% product có dưới 54 lượt rating")
+    st.write("\U0001F5EB có 75% product có dưới 54 lượt rating")
 
 elif choice == 'Recommender system':
     tfidf=pickle.load(open('tfidf.pkl','rb'))
@@ -191,6 +221,14 @@ elif choice == 'Recommender system':
     BaselineOnly_algorithm= pickle.load(open('BaselineOnly_algorithm.pkl','rb'))
     #algorithm  = pickle.load(open('Model Recommender system_Userbased.sav', 'rb'))
     
+    # Function to display image if it's a link
+    def display_image(image_url):
+        if pd.isna(image_url):
+            return None
+        elif isinstance(image_url, str) and image_url.startswith("http"):
+            return image_url
+        else:
+            return None
     # Load Vietnamese stopwords
     def load_dict(file_path):
         with open(file_path, 'r', encoding="utf8") as file:
@@ -266,12 +304,14 @@ elif choice == 'Recommender system':
             wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(wordcloud_dict)
             return wordcloud
     # Sidebar for user interaction
-    choice = st.sidebar.selectbox("Select functionality", ("1 - Chọn loại sản phẩm", "2 - Tìm kiếm sản phẩm", "3 - Chọn sản phẩm theo ID", "4 - Gợi ý sản phẩm theo User ID"))
+    choice = st.sidebar.selectbox("Select functionality", ("1 - Chọn loại sản phẩm", "2 - Tìm kiếm sản phẩm", "3 - Chọn sản phẩm theo ID", "4 - Gợi ý sản phẩm theo User"))
 
     if choice == "1 - Chọn loại sản phẩm":
         #################################################
         ######  1. Chọn sản phẩm  theo type  ############
         #################################################
+        session_state = st.session_state
+
         #Tạo điều khiển để người dùng chọn sản phẩm
         unique_products = ThoiTrangNam_data['sub_category'].unique().copy()
         # Filter out the category "Khác" (Others)
@@ -286,19 +326,63 @@ elif choice == 'Recommender system':
         # Sort the filtered list using the custom sorting key function
         unique_products_sorted_vietnamese = sorted(unique_products_filtered, key=vietnamese_sort_key)   
         st.write("##### 1. Chọn loại sản phẩm")
-        selected_SP = st.sidebar.selectbox("Chọn sản phẩm", unique_products_sorted_vietnamese )
-        st.write("Sản phẩm đã chọn:", selected_SP)
+        selected_SP = st.sidebar.selectbox("Chọn sản phẩm", unique_products_sorted_vietnamese, index= None)
+        if selected_SP is not None:
+            st.write("Sản phẩm đã chọn:", selected_SP)
+            related_SP = ThoiTrangNam_Raw [ThoiTrangNam_Raw['sub_category'].str.lower().str.contains(selected_SP.lower(), na=False)].sort_values(by='rating', ascending=False)
+            # In danh sách sản phẩm liên quan ra màn hình
+            related_products = related_SP[['product_name', 'image', 'price', 'rating']]
 
-        # Tìm sản phẩm liên quan đến sản phẩm đã chọn
-        # st.write("##### 2. Sản phẩm liên quan")
-        # Lấy thông tin sản phẩm đã chọn
-        # Gợi ý sản phẩm liên quan dựa theo mô tả của sản phẩm đã chọn, chuyển thành chữ thường trước khi tìm kiếm 
-        related_SP = ThoiTrangNam_data[ThoiTrangNam_data['sub_category'].str.lower().str.contains(selected_SP.lower(), na=False)].sort_values(by='rating', ascending=False)
-        # In danh sách sản phẩm liên quan ra màn hình
-        st.write("Danh sách sản phẩm liên quan:")
-        st.dataframe(related_SP.head(5))   
-        # Từ sản phẩm đã chọn này, người dùng có thể xem thông tin chi tiết của sản phẩm, xem hình ảnh sản phẩm
-        # hoặc thực hiện các xử lý khác
+            st.write('<font color="blue">**Danh sách các sản phẩm liên quan:**</font>', unsafe_allow_html=True)
+
+            # for index, row in related_products.iterrows():
+            #     st.write(f"**{row['product_name']}**")
+            #     image_url = display_image(row['image'])
+            #     if image_url:
+            #         st.image(image_url, width=200) 
+            #     st.write(f"Giá: {row['price']}")
+            #     st.write(f"Rating: {row['rating']}")
+            #     st.write("---")
+
+            # Define session state to maintain state across interactions
+            session_state = st.session_state
+
+            # Assuming each page will display 5 items
+            items_per_page = 5
+
+            # Calculate total number of pages
+            total_pages = math.ceil(len(related_products) / items_per_page)
+
+            # Get the current page number from session state or default to 1
+            current_page = session_state.get('current_page', 1)
+
+            # Handle button clicks
+            if st.sidebar.button("Previous Page") and current_page > 1:
+                current_page -= 1
+            elif st.sidebar.button("Next Page") and current_page < total_pages:
+                current_page += 1
+
+            # Update session state
+            session_state['current_page'] = current_page
+
+            # Calculate the start and end indices for the current page
+            start_index = (current_page - 1) * items_per_page
+            end_index = min(start_index + items_per_page, len(related_products))
+
+            # Display pagination controls
+            if total_pages > 1:
+                st.sidebar.write(f"Page {current_page} of {total_pages}")
+
+            # Display items for the current page
+            for index in range(start_index, end_index):
+                row = related_products.iloc[index]
+                st.write(f"**{row['product_name']}**")
+                image_url = display_image(row['image'])
+                if image_url:
+                    st.image(image_url, width=200) 
+                st.write(f"Giá: {row['price']}")
+                st.write(f"Rating: {row['rating']}")
+                st.write("---")
 
     elif choice == "2 - Tìm kiếm sản phẩm":
         #################################################
@@ -306,47 +390,57 @@ elif choice == 'Recommender system':
         #################################################
         # tạo điều khiển để người dùng tìm kiếm sản phẩm dựa trên thông tin người dùng nhập
         st.write("##### 2. Tìm kiếm sản phẩm") 
+        # Define session state to maintain state across interactions
+        session_state = st.session_state
+
+        # Your search logic here
         description_input = st.sidebar.text_input("Nhập thông tin tìm kiếm")
-        preprocessed_description = preprocess_text(description_input)
-        tokenized_description = word_tokenize(preprocessed_description)
-        if not tokenized_description:
-            st.warning("Thông tin trống. Xin vui lòng nhập nội dung.")
-        else:
-            query_bow = dictionary.doc2bow(tokenized_description)
-            sims = index[tfidf[query_bow]]
+        if description_input.strip(): 
+            preprocessed_description = preprocess_text(description_input)
+            tokenized_description = word_tokenize(preprocessed_description)
+            if not tokenized_description:
+                st.warning("Thông tin trống. Xin vui lòng nhập nội dung.")
+            else:
+                query_bow = dictionary.doc2bow(tokenized_description)
+                sims = index[tfidf[query_bow]]
+                similarity_df = pd.DataFrame({'Document': range(len(sims)), 'Similarity': sims})
+                similarity_df['product_name'] = ThoiTrangNam_data['product_name']
+                similarity_df = similarity_df.sort_values(by='Similarity', ascending=False)
+                similarity_df = similarity_df[similarity_df['Similarity'] < 1]
 
-            similarity_df = pd.DataFrame({'Document': range(len(sims)), 'Similarity': sims})
-            similarity_df['product_name'] = ThoiTrangNam_data['product_name']
+                # Display top similar products
+                st.subheader("Top 10 sản phẩm tương tự:")
+                top_10_indices = similarity_df.head(10)['Document'].tolist()
+                top_10_descriptions = ThoiTrangNam_data.loc[top_10_indices, 'products_gem_re'].tolist()
+                # st.dataframe(ThoiTrangNam_Raw.loc[top_10_indices])
+                related_products =ThoiTrangNam_Raw.loc[top_10_indices]
 
-            similarity_df = similarity_df.sort_values(by='Similarity', ascending=False)
-            similarity_df = similarity_df[similarity_df['Similarity'] < 1]
+                for index, row in related_products.iterrows():
+                    st.write(f"Product Name: {row['product_name']}")
+                    image_url = display_image(row['image'])
+                    if image_url:
+                        st.image(image_url, width=200)
+                    st.write(f"Giá: {row['price']}")
+                    st.write(f"Rating: {row['rating']}")
+                    st.write("---")
 
-            st.subheader("Top 10 sản phẩm tương tự:")
+                # Generate word cloud for top keywords
+                aggregated_description = ' '.join([word for sublist in top_10_descriptions for word in sublist])
+                cleaned_description = aggregated_description.replace("[", "").replace("]", ",").replace("'", "").replace(" , ", ", ").replace(" ", "").replace("_", " ").replace(",",", ")
+                tokens = cleaned_description.split(",")
+                word_freq = Counter(tokens)
+                most_common_words = word_freq.most_common(30)
+                wordcloud_dict = {word: freq for word, freq in most_common_words}
 
-            top_10_indices = similarity_df.head(10)['Document'].tolist()
-            top_10_descriptions = ThoiTrangNam_data.loc[top_10_indices, 'products_gem_re'].tolist()
-            st.dataframe(ThoiTrangNam_data.iloc[top_10_indices])
-
-            # Concatenate tokens and remove unwanted characters
-            aggregated_description = ' '.join([word for sublist in top_10_descriptions for word in sublist])
-            # Remove unnecessary characters and spaces
-            cleaned_description = aggregated_description.replace("[", "").replace("]", ",").replace("'", "").replace(" , ", ", ").replace(" ", "").replace("_", " ").replace(",",", ")
-            # Display aggregated_description
-            #st.write(cleaned_description)
-            tokens = cleaned_description.split(",")
-            word_freq = Counter(tokens)
-            most_common_words = word_freq.most_common(30)
-            wordcloud_dict = {word: freq for word, freq in most_common_words}
-
-            # Generate the word cloud
-            wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(wordcloud_dict)
-            # Plot the word cloud
-            fig, ax = plt.subplots(figsize=(10, 5))
-            ax.imshow(wordcloud, interpolation='bilinear')
-            ax.axis('off')
-            ax.set_title("Word Cloud for Top 30 Most Common Keywords in Similar items")
-            # Display the plot using Streamlit
-            st.pyplot(fig)
+                # Generate the word cloud
+                wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(wordcloud_dict)
+                # Plot the word cloud
+                fig, ax = plt.subplots(figsize=(10, 5))
+                ax.imshow(wordcloud, interpolation='bilinear')
+                ax.axis('off')
+                ax.set_title("Word Cloud for Top 30 Most Common Keywords in Similar items")
+                # Display the plot using Streamlit
+                st.pyplot(fig)
 
     elif choice == "3 - Chọn sản phẩm theo ID":
         #################################################
@@ -359,27 +453,25 @@ elif choice == 'Recommender system':
         # Filter out the category "Khác" (Others)
         unique_products_id_sorted = sorted(unique_products_id)   
         st.write("##### 3. Chọn sản phẩm theo ID")
-        selected_SP3 = st.sidebar.selectbox("Chọn sản phẩm", unique_products_id)
-        doc_number = int(selected_SP3)
-        st.write("Sản phẩm đã chọn:",selected_SP3," - ", ThoiTrangNam_data['product_name'].iloc[doc_number])
-        
-        # Join the tokenized descriptions into strings
-        tokenized_descriptions = [" ".join(tokens) for tokens in ThoiTrangNam_data['products_gem_re']]
-        # Apply the desired cleaning operations to each string
-        cleaned_descriptions = [desc.replace(" ", "").replace(",", ", ") for desc in tokenized_descriptions]
-        # Create TF-IDF vectorizer
-        tfidf_vectorizer = TfidfVectorizer()
-        # Fit and transform the tokenized descriptions
-        tfidf_matrix = tfidf_vectorizer.fit_transform(cleaned_descriptions)
-        
-        
-        # Check if the document number is valid
-        if doc_number < 0 or doc_number >= len(ThoiTrangNam_data):
-            st.write("Không có sản phẩm với ID ",selected_SP3)
-        else:
+        selected_SP3 = st.sidebar.selectbox("Chọn sản phẩm", unique_products_id, index = None)
+        if selected_SP3 is not None:
+            doc_number = int(selected_SP3)
+            # ID sản phẩm luôn nằm trong file
+            st.write("Sản phẩm đã chọn:",selected_SP3," - ", ThoiTrangNam_data[ThoiTrangNam_data['product_id'] == doc_number]['product_name'])
+            
+            selected_product_index = ThoiTrangNam_data[ThoiTrangNam_data['product_id'] == doc_number].index
+
+            # Join the tokenized descriptions into strings
+            tokenized_descriptions = [" ".join(tokens) for tokens in ThoiTrangNam_data['products_gem_re']]
+            # Apply the desired cleaning operations to each string
+            cleaned_descriptions = [desc.replace(" ", "").replace(",", ", ") for desc in tokenized_descriptions]
+            # Create TF-IDF vectorizer
+            tfidf_vectorizer = TfidfVectorizer()
+            # Fit and transform the tokenized descriptions
+            tfidf_matrix = tfidf_vectorizer.fit_transform(cleaned_descriptions)
 
             # Compute cosine similarity between the query document and all other documents
-            similarities = cosine_similarity(tfidf_matrix[doc_number], tfidf_matrix).flatten()
+            similarities = cosine_similarity(tfidf_matrix[selected_product_index], tfidf_matrix).flatten()
 
             # Create a DataFrame to store similarity scores and product names
             similarity_df = pd.DataFrame({'Product': range(len(similarities)), 'Similarity': similarities})
@@ -396,7 +488,15 @@ elif choice == 'Recommender system':
 
             # Get the indices of the top 10 similar products
             top_10_indices = similarity_df.head(10)['Product'].tolist()
-            st.dataframe(ThoiTrangNam_data.iloc[top_10_indices])
+            related_products =ThoiTrangNam_Raw.loc[top_10_indices]
+            for index, row in related_products.iterrows():
+                st.write(f"Product Name: {row['product_name']}")
+                image_url = display_image(row['image'])
+                if image_url:
+                    st.image(image_url, width=200)
+                st.write(f"Giá: {row['price']}")
+                st.write(f"Rating: {row['rating']}")
+                st.write("---")
 
             # Retrieve the tokenized descriptions of the top 10 similar products from filtered_data
             top_10_descriptions = ThoiTrangNam_data.loc[top_10_indices, 'products_gem_re'].tolist()
@@ -428,36 +528,46 @@ elif choice == 'Recommender system':
             plt.title("Word Cloud for Top 30 Most Common Keywords in Similar Items")
             st.pyplot(plt)
 
-    elif choice == "4 - Gợi ý sản phẩm theo User ID":
+    elif choice == "4 - Gợi ý sản phẩm theo User":
         #################################################
         ######  4. Gợi ý sản phẩm theo User ID  #########
         #################################################
-        # Sort the filtered list using the custom sorting key function
-        # Surprise_Rating_data = pd.read_csv(r'Surprise_Rating_data.csv')
-        #st.dataframe(Rating_data.head())
-        # Tạo điều khiển để người dùng chọn sản phẩm
-        unique_user_id = Rating_data['user_id'].unique().copy()
-        # Filter out the category "Khác" (Others)
-        unique_user_id_sorted = sorted(unique_user_id)   
-        #st.dataframe(unique_user_id_sorted)
+        def suggest_similar_user(inputted_user, user_list):
+            similar_users = difflib.get_close_matches(inputted_user, user_list, n=5)
+            return similar_users
         
-        st.write("##### 4. Gợi ý sản phẩm theo User ID")
-        
-        inputted_user = st.sidebar.text_input("Nhập user id tìm kiếm")
- 
-       
-        
-        # Check if the document number is valid
-        if inputted_user not in unique_user_id and not inputted_user.isdigit():
-            st.write("User ID không hợp lệ. Vui lòng nhập một user ID khác.")
-        else:
-            # Display the top 10 most similar products
-            userid =int(inputted_user)
-            st.write("Top 10 sản phẩm user ",inputted_user," đã mua:")
-            df_score = Rating_data[['product_id']]
-            df_score['EstimateScore'] = df_score['product_id'].apply(lambda x: BaselineOnly_algorithm.predict(userid, x).est)
-            df_score = df_score.sort_values(by=['EstimateScore'], ascending=False)
-            df_score = df_score.drop_duplicates()
-            merged_data = pd.merge(df_score, ThoiTrangNam_data, on='product_id')
-            # Display the merged data in a st.dataframe
-            st.dataframe(merged_data.head(10))
+        st.write("##### 4. Gợi ý sản phẩm theo User")
+        inputted_user = st.sidebar.text_input("Nhập user tìm kiếm")
+        if inputted_user.strip():
+            # Check if the user ID is valid
+            if Rating_data[Rating_data['user'] == inputted_user].shape[0] == 0:
+                st.write("User không hợp lệ.")
+                # Suggest similar user names
+                similar_users = suggest_similar_user(inputted_user, Rating_data['user'])
+                if similar_users:
+                    st.write("Có thể bạn muốn tìm các user name sau đây:")
+                    st.write(similar_users)
+                    st.write("Xin vui lòng copy, paste và thử lại.")
+            else:
+                # Display the top 10 most similar products for the found user
+                userid = Rating_data[Rating_data['user'] == inputted_user]['user_id'].iloc[0]
+
+                st.write("Top 10 sản phẩm phù hợp với user ", inputted_user)
+                
+                df_score = Rating_data[['product_id']]
+                df_score['EstimateScore'] = df_score['product_id'].apply(lambda x: BaselineOnly_algorithm.predict(userid, x).est)
+                df_score = df_score.sort_values(by=['EstimateScore'], ascending=False)
+                df_score = df_score.drop_duplicates()
+                merged_data = pd.merge(df_score, ThoiTrangNam_Raw, on='product_id')
+                # Display the merged data in a st.dataframe
+                related_products =merged_data[['product_name', 'image', 'price', 'EstimateScore', 'rating']].head(10)
+                # st.dataframe(merged_data.head(10))
+                for index, row in related_products.iterrows():
+                    st.write(f"Product Name: {row['product_name']}")
+                    image_url = display_image(row['image'])
+                    if image_url:
+                        st.image(image_url, width=200)
+                    st.write(f"Giá: {row['price']}")
+                    st.write(f"Rating: {row['rating']}")
+                    st.write(f"EstimateRatingScore: {row['EstimateScore']}")
+                    st.write("---")
