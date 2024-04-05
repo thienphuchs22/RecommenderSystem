@@ -546,6 +546,8 @@ elif choice == 'Recommender system':
                     st.write("Có thể bạn muốn tìm các user name sau đây:")
                     st.write(similar_users)
                     st.write("Xin vui lòng copy, paste và thử lại.")
+                else:
+                    st.write("Không có user nào để gợi ý cho keyword bạn nhập vào.")
             else:
                 # Display the top 10 most similar products for the found user
                 userid = Rating_data[Rating_data['user'] == inputted_user]['user_id'].iloc[0]
