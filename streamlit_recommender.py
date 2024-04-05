@@ -98,7 +98,7 @@ if choice == 'Business Objective':
     st.image("userbased.png")
 
     st.subheader("Giáo viên hướng dẫn:")
-    st.write("\U0001F469 - Hạ Thị Thiều Dao")
+    st.write("\U0001F469 - Khuất Thuỳ Phương")
     
     st.subheader("Nhóm Thực hiện:")
     st.write("\U0001F467 - Hạ Thị Thiều Dao")
